@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Balong POS – Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <div class="layout">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo-circle">
+          <i class="fa-solid fa-scissors"></i>
+        </div>
+        <div>
+          <div class="sidebar-brand">BALONG</div>
+          <div class="sidebar-user-role" id="sidebarUserRole">Admin User</div>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <button class="nav-link active" data-section="dashboard">
+          <i class="fa-solid fa-gauge-high"></i> <span>Dashboard</span>
+        </button>
+        <button class="nav-link" data-section="pos">
+          <i class="fa-solid fa-cart-shopping"></i> <span>POS</span>
+        </button>
+        <button class="nav-link" data-section="customers">
+          <i class="fa-regular fa-user"></i> <span>Customers</span>
+        </button>
+        <button class="nav-link" data-section="appointments">
+          <i class="fa-regular fa-calendar-check"></i>
+          <span>Appointments</span>
+        </button>
+        <button class="nav-link" data-section="services">
+          <i class="fa-solid fa-scissors"></i> <span>Services</span>
+        </button>
+        <button class="nav-link" data-section="inventory">
+          <i class="fa-solid fa-box"></i> <span>Inventory</span>
+        </button>
+        <button class="nav-link" data-section="barbers">
+          <i class="fa-solid fa-user-tie"></i> <span>Barbers</span>
+        </button>
+        <button class="nav-link" data-section="analytics">
+          <i class="fa-solid fa-chart-line"></i> <span>Analytics</span>
+        </button>
+        <button class="nav-link" data-section="reports">
+          <i class="fa-solid fa-chart-column"></i> <span>Reports</span>
+        </button>
+        <button class="nav-link" data-section="settings">
+          <i class="fa-solid fa-gear"></i> <span>Settings</span>
+        </button>
+      </nav>
+
+      <button class="nav-link nav-logout" id="logoutBtn">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i> <span>Logout</span>
+      </button>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <h1 class="page-title" id="pageTitle">Dashboard</h1>
+          <p class="page-subtitle">Today’s overview</p>
+        </div>
+        <div class="topbar-right">
+          <input type="text" class="top-search" placeholder="Search..." />
+          <div class="user-badge">
+            <span class="user-name" id="topUserName">Admin User</span>
+            <span class="user-avatar">
+              <i class="fa-regular fa-user"></i>
+            </span>
+          </div>
+        </div>
+      </header>
+
+      <!-- DASHBOARD -->
+      <section id="dashboard" class="section active">
+        <div class="kpi-row">
+          <div class="kpi-card hover-lift">
+            <div class="kpi-card-header">
+              <span>Today's Revenue</span>
+              <i class="fa-solid fa-dollar-sign kpi-icon"></i>
+            </div>
+            <div class="kpi-main" id="dashRevenue">₱0.00</div>
+            <div class="kpi-sub" id="dashTickets">0 tickets</div>
+          </div>
+          <div class="kpi-card hover-lift">
+            <div class="kpi-card-header">
+              <span>Total Tickets</span>
+              <i class="fa-regular fa-file-lines kpi-icon"></i>
+            </div>
+            <div class="kpi-main" id="dashTotalTickets">0</div>
+            <div class="kpi-sub" id="dashAvgTicket">Avg: ₱0.00</div>
+          </div>
+          <div class="kpi-card hover-lift">
+            <div class="kpi-card-header">
+              <span>Commissions</span>
+              <i class="fa-solid fa-chart-line kpi-icon"></i>
+            </div>
+            <div class="kpi-main" id="dashCommission">₱0.00</div>
+            <div class="kpi-sub" id="dashNet">Net: ₱0.00</div>
+          </div>
+        </div>
+
+        <div class="dashboard-grid">
+          <div class="card hover-lift">
+            <div class="card-title">Top Services Today</div>
+            <ul class="simple-list" id="dashTopServices">
+              <li>No services sold today</li>
+            </ul>
+          </div>
+
+          <div class="card hover-lift">
+            <div class="card-title">Revenue by Payment Type</div>
+            <div class="pill-row">
+              <span class="pill pill-muted">Cash: ₱0.00</span>
+              <span class="pill pill-muted">GCash: ₱0.00</span>
+              <span class="pill pill-muted">Card: ₱0.00</span>
+            </div>
+            <p class="card-muted small-mt">No sales today.</p>
+          </div>
+
+          <div class="card hover-lift">
+            <div class="card-title">Today’s Appointments</div>
+            <ul class="simple-list" id="dashAppointments">
+              <li>No appointments scheduled.</li>
+            </ul>
+          </div>
+
+          <div class="card card-wide hover-lift">
+            <div class="card-title">
+              <i class="fa-solid fa-triangle-exclamation text-danger"></i>
+              Low Stock Alerts
+            </div>
+            <div class="low-stock-list" id="lowStockContainer">
+              <!-- Filled by JS -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- POS -->
+      <section id="pos" class="section">
+        <div class="page-strip-header">
+          <h2>Point of Sale</h2>
+          <p>Process services and products</p>
+        </div>
+        <div class="pos-layout">
+          <div class="pos-left card hover-lift-sm">
+            <label class="field-label">Customer name (optional)</label>
+            <input
+              type="text"
+              class="search"
+              id="posCustomerName"
+              placeholder="Enter customer name..."
+            />
+
+            <div class="pos-tabs">
+              <button class="pos-tab active">Services</button>
+              <button class="pos-tab">Products</button>
+            </div>
+
+            <input
+              type="text"
+              class="search"
+              id="serviceSearch"
+              placeholder="Search services or products..."
+            />
+
+            <div id="posServiceSections">
+              <!-- Sections filled by JS for variety -->
+            </div>
+          </div>
+
+          <aside class="pos-right card hover-lift-sm">
+            <div class="card-title">Current Order</div>
+            <div id="cartEmpty" class="card-muted center-muted">
+              Cart is empty<br />
+              <small>Add services or products to begin</small>
+            </div>
+
+            <table class="table cart-table" id="cartTable">
+              <thead>
+                <tr>
+                  <th>Item</th>
+                  <th>Qty</th>
+                  <th>Price</th>
+                  <th>Subtotal</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+
+            <div class="cart-summary">
+              <div>
+                <span>Subtotal:</span>
+                <span id="subtotalAmount">₱0.00</span>
+              </div>
+              <div>
+                <span>Tax:</span>
+                <span id="taxAmount">₱0.00</span>
+              </div>
+              <div class="cart-total">
+                <span>Total:</span>
+                <span id="totalAmount">₱0.00</span>
+              </div>
+            </div>
+
+            <div class="payment-buttons">
+              <button class="btn-chip active"><i class="fa-solid fa-money-bill-wave"></i> Cash</button>
+              <button class="btn-chip"><i class="fa-brands fa-cc-visa"></i> Card</button>
+              <button class="btn-chip"><i class="fa-solid fa-mobile-screen"></i> GCash</button>
+            </div>
+
+            <button class="btn-primary checkout-btn" id="completeSaleBtn">
+              Checkout
+            </button>
+          </aside>
+        </div>
+      </section>
+
+      <!-- CUSTOMERS -->
+      <section id="customers" class="section">
+        <div class="page-strip-header">
+          <h2>Customers</h2>
+          <p>Manage customer records</p>
+        </div>
+        <div class="card hover-lift-sm">
+          <div class="card-toolbar">
+            <div class="toolbar-left">
+              <input
+                type="text"
+                class="search search-inline"
+                placeholder="Search customers..."
+              />
+            </div>
+            <button class="btn-primary btn-pill">
+              <i class="fa-solid fa-user-plus"></i> New Customer
+            </button>
+          </div>
+          <table class="table hover-rows">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Contact</th>
+                <th>Last Visit</th>
+                <th>Total Visits</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="customersTableBody">
+              <!-- JS fills -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- APPOINTMENTS -->
+      <section id="appointments" class="section">
+        <div class="page-strip-header">
+          <h2>Appointments</h2>
+          <p>Schedule and track bookings</p>
+        </div>
+        <div class="card hover-lift-sm">
+          <div class="card-toolbar">
+            <div class="toolbar-left">
+              <input type="date" class="select-inline" />
+              <input type="date" class="select-inline" />
+            </div>
+            <button class="btn-primary btn-pill">
+              <i class="fa-regular fa-calendar-plus"></i> New Appointment
+            </button>
+          </div>
+          <table class="table hover-rows">
+            <thead>
+              <tr>
+                <th>Date &amp; Time</th>
+                <th>Customer</th>
+                <th>Barber</th>
+                <th>Service</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="appointmentsTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- SERVICES -->
+      <section id="services" class="section">
+        <div class="page-strip-header">
+          <h2>Services</h2>
+          <p>Configure services and prices</p>
+        </div>
+        <div class="card hover-lift-sm">
+          <div class="card-toolbar">
+            <div class="toolbar-left">
+              <button class="pill-filter active">All</button>
+              <button class="pill-filter">Haircuts</button>
+              <button class="pill-filter">Shaving</button>
+              <button class="pill-filter">Combos</button>
+            </div>
+            <button class="btn-primary btn-pill">
+              <i class="fa-solid fa-plus"></i> Add Service
+            </button>
+          </div>
+          <table class="table hover-rows">
+            <thead>
+              <tr>
+                <th>Service</th>
+                <th>Category</th>
+                <th>Duration</th>
+                <th>Price</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="servicesTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- INVENTORY -->
+      <section id="inventory" class="section">
+        <div class="page-strip-header">
+          <h2>Inventory</h2>
+          <p>Manage your product inventory</p>
+        </div>
+        <div class="card hover-lift-sm">
+          <div class="card-toolbar">
+            <div class="toolbar-left">
+              <input
+                type="text"
+                class="search search-inline"
+                placeholder="Search products..."
+              />
+            </div>
+            <button class="btn-primary btn-pill">
+              <i class="fa-solid fa-plus"></i> Add Product
+            </button>
+          </div>
+          <div id="inventoryGroups">
+            <!-- JS: grouped tables -->
+          </div>
+        </div>
+      </section>
+
+      <!-- BARBERS -->
+      <section id="barbers" class="section">
+        <div class="page-strip-header">
+          <h2>Barbers</h2>
+          <p>Manage your team of barbers</p>
+        </div>
+        <div class="card hover-lift-sm">
+          <div class="card-toolbar">
+            <div></div>
+            <button class="btn-primary btn-pill">
+              <i class="fa-solid fa-user-plus"></i> Add Barber
+            </button>
+          </div>
+          <table class="table hover-rows">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Username</th>
+                <th>Contact</th>
+                <th>Commission Rate</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="barbersTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ANALYTICS -->
+      <section id="analytics" class="section">
+        <div class="page-strip-header">
+          <h2>Analytics</h2>
+          <p>Visualize your performance</p>
+        </div>
+        <div class="analytics-grid">
+          <div class="card hover-lift">
+            <div class="card-title">Best Selling Service</div>
+            <p class="big-highlight" id="analyticsBestService">—</p>
+            <p class="card-muted">Based on completed tickets.</p>
+          </div>
+          <div class="card hover-lift">
+            <div class="card-title">Top Barber</div>
+            <p class="big-highlight" id="analyticsTopBarber">—</p>
+            <p class="card-muted">By total revenue generated.</p>
+          </div>
+          <div class="card hover-lift">
+            <div class="card-title">Busiest Day</div>
+            <p class="big-highlight" id="analyticsBusiestDay">—</p>
+            <p class="card-muted">From your recent sales.</p>
+          </div>
+        </div>
+        <div class="card hover-lift-sm">
+          <div class="card-title">Simple Sales Timeline (Mock)</div>
+          <div class="fake-chart">
+            <div class="fake-bar" style="height: 30%"></div>
+            <div class="fake-bar" style="height: 60%"></div>
+            <div class="fake-bar" style="height: 45%"></div>
+            <div class="fake-bar" style="height: 70%"></div>
+            <div class="fake-bar" style="height: 40%"></div>
+            <div class="fake-bar" style="height: 80%"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- REPORTS -->
+      <section id="reports" class="section">
+        <div class="page-strip-header">
+          <h2>Reports</h2>
+          <p>Sales summaries and breakdowns</p>
+        </div>
+        <div class="card hover-lift-sm">
+          <div class="card-toolbar">
+            <div class="toolbar-left">
+              <input type="date" class="select-inline" />
+              <input type="date" class="select-inline" />
+              <select class="select-inline">
+                <option>All Barbers</option>
+                <option>Tony</option>
+                <option>Jake</option>
+                <option>Carlos</option>
+              </select>
+            </div>
+            <button class="btn-primary btn-pill">
+              <i class="fa-solid fa-file-export"></i> Export
+            </button>
+          </div>
+          <table class="table hover-rows">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th># of Tickets</th>
+                <th>Gross</th>
+                <th>Net</th>
+              </tr>
+            </thead>
+            <tbody id="reportTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- SETTINGS -->
+      <section id="settings" class="section">
+        <div class="page-strip-header">
+          <h2>Settings</h2>
+          <p>System configuration</p>
+        </div>
+        <div class="settings-grid">
+          <div class="card hover-lift-sm">
+            <div class="card-title">Profile</div>
+            <div class="settings-row">
+              <label>Display name</label>
+              <input type="text" class="search" value="Admin User" />
+            </div>
+            <div class="settings-row">
+              <label>Email</label>
+              <input
+                type="email"
+                class="search"
+                value="admin@balong-pos.com"
+              />
+            </div>
+            <div class="settings-row">
+              <label>Password</label>
+              <button class="btn-primary btn-pill">Change Password</button>
+            </div>
+          </div>
+
+          <div class="card hover-lift-sm">
+            <div class="card-title">Branches</div>
+            <div class="settings-row-between">
+              <span>Main Branch – Digos City</span>
+              <label class="toggle">
+                <input type="checkbox" checked />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div class="settings-row-between">
+              <span>Gaisano Branch</span>
+              <label class="toggle">
+                <input type="checkbox" checked />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div class="settings-row-between">
+              <span>Mintal Branch</span>
+              <label class="toggle">
+                <input type="checkbox" />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Balong POS – Login</title>
+  <link rel="stylesheet" href="style.css" />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    crossorigin="anonymous"
+  />
+  <script src="script.js" defer></script>
+</head>
+<body class="login-page">
+  <div class="login-glow"></div>
+  <div class="login-card">
+    <div class="login-logo-circle">
+      <i class="fa-solid fa-scissors"></i>
+    </div>
+    <h1 class="login-title">BALONG</h1>
+    <p class="login-subtitle">Point of Sale System</p>
+
+    <form id="loginForm" class="login-form">
+      <label class="field-label" for="username">Username</label>
+      <input
+        type="text"
+        id="username"
+        class="login-input"
+        placeholder="Enter your username"
+        required
+      />
+
+      <label class="field-label" for="password">Password</label>
+      <input
+        type="password"
+        id="password"
+        class="login-input"
+        placeholder="Enter your password"
+        required
+      />
+
+      <button type="submit" class="btn-primary login-btn">
+        <span>Sign In</span>
+        <i class="fa-solid fa-arrow-right"></i>
+      </button>
+
+      <p class="login-error" id="loginError"></p>
+    </form>
+
+    <div class="login-demo-box">
+      <p>Demo Credentials:</p>
+      <ul>
+        <li><strong>Admin:</strong> <code>admin / admin123</code></li>
+        <li><strong>Cashier:</strong> <code>cashier / cashier123</code></li>
+        <li><strong>Barber:</strong> <code>barber / barber123</code></li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>
