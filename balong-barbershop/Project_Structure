@@ -1,0 +1,256 @@
+# BALONG POS - Project Structure
+
+## 📁 Directory Overview
+
+```
+/
+├── App.tsx                      # Main application with routing
+├── README.md                    # Project documentation
+├── PROJECT_STRUCTURE.md         # This file
+│
+├── /lib                         # Core business logic
+│   ├── types.ts                # TypeScript type definitions
+│   ├── storage.ts              # LocalStorage service layer
+│   ├── utils.ts                # Utility functions
+│   └── AuthContext.tsx         # Authentication provider
+│
+├── /components
+│   ├── /auth                   # Authentication
+│   │   └── LoginPage.tsx
+│   │
+│   ├── /layout                 # Layout components
+│   │   ├── Sidebar.tsx
+│   │   └── MainLayout.tsx
+│   │
+│   ├── /dashboard              # Dashboard view
+│   │   └── Dashboard.tsx
+│   │
+│   ├── /pos                    # Point of Sale
+│   │   ├── POSScreen.tsx       # Main POS container
+│   │   ├── ServiceGrid.tsx     # Service selection grid
+│   │   ├── ProductSearch.tsx   # Product selection grid
+│   │   ├── Cart.tsx            # Shopping cart
+│   │   ├── CheckoutDialog.tsx  # Checkout modal
+│   │   └── ReceiptDialog.tsx   # Receipt display modal
+│   │
+│   ├── /receipt                # Receipt components
+│   │   └── Receipt.tsx         # Printable receipt template
+│   │
+│   ├── /services               # Service management
+│   │   └── ServicesPage.tsx
+│   │
+│   ├── /inventory              # Inventory management
+│   │   └── InventoryPage.tsx
+│   │
+│   ├── /barbers                # Barber management
+│   │   └── BarbersPage.tsx
+│   │
+│   ├── /reports                # Reports & Commission
+│   │   └── ReportsPage.tsx
+│   │
+│   ├── /settings               # Settings
+│   │   └── SettingsPage.tsx
+│   │
+│   └── /ui                     # shadcn/ui components
+│       ├── button.tsx
+│       ├── card.tsx
+│       ├── dialog.tsx
+│       ├── input.tsx
+│       ├── select.tsx
+│       ├── table.tsx
+│       └── ... (40+ components)
+│
+└── /styles
+    └── globals.css             # Global styles & BALONG theme
+```
+
+## 🔑 Key Files Explained
+
+### Core Logic (`/lib`)
+
+**types.ts**
+- Defines all TypeScript interfaces
+- User, Service, Product, Sale, Commission types
+- Ensures type safety across the app
+
+**storage.ts**
+- Manages localStorage operations
+- CRUD functions for all entities
+- Seed data initialization
+- Simulates API-like structure for easy backend integration
+
+**utils.ts**
+- Utility functions (formatting, ID generation, calculations)
+- Date/time helpers
+- Currency formatting
+- Ticket number generation
+
+**AuthContext.tsx**
+- React context for authentication
+- Login/logout functionality
+- User state management
+- Role-based access control
+
+### Components
+
+**POS System (`/components/pos`)**
+- `POSScreen.tsx`: Main container, manages cart state and checkout flow
+- `ServiceGrid.tsx`: Displays services grouped by category
+- `ProductSearch.tsx`: Displays products with stock info
+- `Cart.tsx`: Shows selected items, quantity controls, barber assignment
+- `CheckoutDialog.tsx`: Payment method selection and completion
+- `ReceiptDialog.tsx`: Shows completed sale with print option
+
+**Management Pages**
+- `ServicesPage.tsx`: CRUD for services
+- `InventoryPage.tsx`: CRUD for products + stock adjustments
+- `BarbersPage.tsx`: CRUD for barber users
+- `SettingsPage.tsx`: Shop configuration
+
+**Reports**
+- `ReportsPage.tsx`: Commission reports with filtering and analytics
+
+**Dashboard**
+- `Dashboard.tsx`: Today's metrics, top services, low stock alerts
+
+## 🔄 Data Flow
+
+### Making a Sale
+1. User selects services/products → Added to cart state
+2. Assigns barbers to services
+3. Clicks checkout → Opens CheckoutDialog
+4. Selects payment method → Completes checkout
+5. Sale created in storage:
+   - Updates product stock
+   - Creates commission records
+   - Generates ticket number
+6. Opens ReceiptDialog with completed sale
+
+### Commission Calculation
+```
+Service Price × Quantity - Discount = Line Total
+Line Total × Commission Rate = Commission Amount
+```
+
+### Stock Management
+```
+Sale Created → Product Stock - Quantity = New Stock
+Manual Adjustment → Stock + Adjustment = New Stock (with reason)
+```
+
+## 🎨 Styling
+
+**Theme Colors** (in `globals.css`)
+```css
+--primary: #E3262F      /* BALONG Red */
+--secondary: #333333    /* Dark Gray */
+--background: #ffffff   /* White */
+--foreground: #000000   /* Black */
+--border: #cccccc       /* Light Gray */
+```
+
+**Typography**
+- Default font weights configured
+- Responsive font sizes
+- No Tailwind font classes used (uses CSS variables)
+
+## 🔐 Authentication Flow
+
+```
+1. User lands on "/" → Shows LoginPage
+2. Enters credentials → AuthContext.login()
+3. Validates against localStorage users
+4. Sets current user → Redirect based on role
+   - Admin/Cashier → /dashboard
+   - Barber → /reports
+5. PrivateRoute checks auth on each route
+6. Sidebar shows role-appropriate navigation
+```
+
+## 📊 Data Model
+
+### User
+```typescript
+{
+  id, username, password, name, role,
+  email?, phone?, commissionRate?, isActive
+}
+```
+
+### Service
+```typescript
+{
+  id, name, category, basePrice, duration,
+  commissionRate, description?, isActive
+}
+```
+
+### Product
+```typescript
+{
+  id, name, sku, category, costPrice, sellingPrice,
+  stock, lowStockThreshold, supplier?, isActive
+}
+```
+
+### Sale
+```typescript
+{
+  id, ticketNumber, customerName?,
+  items: [SaleLineItem],
+  subtotal, discount, tax, total,
+  paymentMethod, cashReceived?, change?,
+  totalCommission, cashierId, cashierName,
+  notes?, createdAt
+}
+```
+
+### SaleLineItem
+```typescript
+{
+  id, type, itemId, itemName, quantity,
+  unitPrice, discount,
+  barberId?, barberName?, commissionRate?,
+  commissionAmount?
+}
+```
+
+## 🚀 Adding New Features
+
+### Adding a New Page
+1. Create component in `/components/[feature]/`
+2. Add route in `App.tsx`
+3. Add navigation item in `Sidebar.tsx`
+4. Define required roles in `PrivateRoute`
+
+### Adding a New Entity
+1. Define type in `lib/types.ts`
+2. Add storage functions in `lib/storage.ts`
+3. Create management page in `/components/`
+4. Add to seed data if needed
+
+### Connecting to Backend
+1. Create API service layer (replace storage.ts functions)
+2. Update storage functions to make HTTP requests
+3. Add error handling and loading states
+4. Implement authentication tokens
+5. Update types to match API responses
+
+## 🎯 Best Practices Used
+
+- **Type Safety**: Full TypeScript coverage
+- **Component Composition**: Small, focused components
+- **State Management**: React hooks + Context API
+- **Separation of Concerns**: Logic in /lib, UI in /components
+- **Consistent Naming**: Clear, descriptive names
+- **Error Handling**: Toast notifications for user feedback
+- **Responsive Design**: Mobile-first, tablet-optimized
+- **Accessibility**: Semantic HTML, labels, ARIA attributes
+
+## 📝 Notes
+
+- All data stored in localStorage (browser-based)
+- No external API calls
+- Receipt printing uses browser print dialog
+- Optimized for landscape tablet use (iPad-like)
+- Clean, professional UI matching barbershop aesthetic
