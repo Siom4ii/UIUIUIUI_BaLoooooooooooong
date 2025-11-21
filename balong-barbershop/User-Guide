@@ -1,0 +1,416 @@
+# BALONG POS System - User Guide
+
+## 🎯 Getting Started
+
+### First Login
+When you first access the system, you'll see the login screen with the BALONG logo.
+
+**Demo Accounts:**
+- **Admin**: username: `admin` / password: `admin123`
+- **Cashier**: username: `cashier` / password: `cashier123`
+- **Barber**: username: `tony` / password: `barber123`
+
+## 👥 User Roles
+
+### Admin
+Full access to all features:
+- View dashboard
+- Process sales at POS
+- Manage services
+- Manage inventory
+- Manage barbers & users
+- View all commission reports
+- Configure settings
+
+### Cashier
+Limited to daily operations:
+- View dashboard
+- Process sales at POS
+- Cannot modify services, inventory, or settings
+
+### Barber
+View-only access to personal data:
+- View personal commission reports
+- See daily/weekly/monthly earnings
+- Cannot access POS or management features
+
+## 📊 Dashboard (Admin/Cashier)
+
+### Overview Cards
+- **Today's Revenue**: Total sales for today
+- **Total Tickets**: Number of transactions
+- **Commissions**: Total paid to barbers today
+- **Net Revenue**: Revenue minus commissions
+
+### Top Services
+Shows the best-performing services based on revenue, helping you understand customer preferences.
+
+### Revenue by Payment Type
+Breaks down sales by Cash, Card, or Other payment methods.
+
+### Low Stock Alerts
+Highlights products that need restocking (at or below threshold).
+
+## 💳 Point of Sale (POS) - Main Feature
+
+### Step-by-Step Sale Process
+
+**1. Start New Sale**
+- Navigate to POS from sidebar
+- Screen splits: Services/Products on left, Cart on right
+
+**2. Add Customer (Optional)**
+- Enter customer name in the top field
+- Useful for regular customers or appointments
+
+**3. Select Services**
+- Click on any service tile to add to cart
+- Services are grouped by category:
+  - Haircuts (Classic, Premium, Kids)
+  - Shaving (Beard Trim, Hot Towel Shave)
+  - Combos (Haircut + Beard, Haircut + Shave)
+  - Coloring (Hair Color)
+
+**4. Select Products (Optional)**
+- Switch to Products tab
+- Click on products to add (Pomade, Beard Oil, etc.)
+- Products show current stock
+- Red "Low" badge appears if stock is low
+
+**5. Configure Cart Items**
+- **Services**: MUST assign a barber (required)
+  - Click dropdown under service
+  - Select barber name
+  - Commission calculates automatically
+- **Products**: Adjust quantity
+  - Use - and + buttons
+  - Stock will decrease on sale completion
+
+**6. Review Totals**
+Cart shows:
+- Subtotal (before tax)
+- Tax (8% default)
+- Total due
+
+**7. Checkout**
+- Click blue "Checkout" button
+- Cannot checkout if services lack barber assignment
+
+**8. Payment**
+- Select payment method:
+  - **Cash**: Enter amount received, see change calculated
+  - **Card**: Just confirm
+  - **Other**: For alternative payments
+- Add notes if needed (optional)
+- Click "Complete Sale"
+
+**9. Receipt**
+- Receipt appears automatically
+- Options:
+  - **Print Receipt**: Opens browser print dialog
+  - **New Sale**: Clears cart, starts fresh
+
+### POS Tips
+- Use search bar to quickly find services/products
+- Services automatically apply their commission rates
+- Discounts can be added per item (future feature)
+- Cart saves state while browsing services/products
+
+## 🔧 Services Management (Admin Only)
+
+### Adding a Service
+1. Click "Add Service" button
+2. Fill in details:
+   - **Name**: e.g., "Classic Haircut"
+   - **Category**: e.g., "Haircuts"
+   - **Price**: Base price in dollars
+   - **Duration**: Time in minutes
+   - **Commission Rate**: Percentage (default 50%)
+   - **Description**: Optional details
+3. Click "Create"
+
+### Editing a Service
+1. Find service in the list
+2. Click edit icon (pencil)
+3. Modify fields
+4. Click "Update"
+
+### Deleting a Service
+1. Click delete icon (trash)
+2. Confirm deletion
+3. Service is permanently removed
+
+### Service Organization
+- Services automatically group by category
+- All categories display separately
+- Inactive services can be hidden (set isActive: false)
+
+## 📦 Inventory Management (Admin Only)
+
+### Adding a Product
+1. Click "Add Product"
+2. Fill in complete information:
+   - **Product Name**: e.g., "Classic Pomade"
+   - **SKU**: Unique identifier (e.g., "POM-001")
+   - **Category**: e.g., "Styling"
+   - **Cost Price**: What you paid
+   - **Selling Price**: What customer pays
+   - **Initial Stock**: Starting quantity
+   - **Low Stock Threshold**: Alert trigger (e.g., 10)
+   - **Supplier**: Vendor name (optional)
+3. Click "Create"
+
+### Stock Adjustments
+When you need to add or remove stock manually:
+
+1. Find product in inventory
+2. Click adjustment icon (package with plus)
+3. Enter adjustment:
+   - **Positive number**: Add stock (e.g., 50 for restock)
+   - **Negative number**: Remove stock (e.g., -3 for damage)
+4. Enter reason:
+   - "Restock from supplier"
+   - "Damage"
+   - "Sample given to customer"
+   - "Inventory correction"
+5. Click "Adjust Stock"
+
+### Automatic Stock Tracking
+- Stock decreases automatically when products are sold
+- Low stock alerts appear on dashboard
+- Track stock history through adjustments
+
+### Inventory Tips
+- Set realistic low stock thresholds
+- Regularly check dashboard for alerts
+- Document all manual adjustments
+- Review cost vs. selling price for profitability
+
+## 👨‍💼 Barber Management (Admin Only)
+
+### Adding a Barber
+1. Click "Add Barber"
+2. Fill in details:
+   - **Full Name**: Display name
+   - **Username**: For login
+   - **Password**: Initial password
+   - **Email**: Optional contact
+   - **Phone**: Optional contact
+   - **Commission Rate**: Default % for this barber
+3. Click "Create"
+
+### Commission Rates Explained
+- **Service Rate**: Each service has a default rate (e.g., 50%)
+- **Barber Rate**: Each barber has a default rate (e.g., 45%)
+- **Calculation**: Service rate is used in POS
+- **Override**: You can set different rates per barber
+
+### Editing Barbers
+1. Click edit icon
+2. Modify information
+3. Leave password blank to keep existing password
+4. Update commission rate if needed
+5. Click "Update"
+
+### Active/Inactive Status
+- Inactive barbers don't appear in POS dropdown
+- Useful for managing temporary or departed staff
+- Historical data remains intact
+
+## 📈 Reports & Commission (Admin/Barber)
+
+### Viewing Commission Reports
+
+**For Admins:**
+1. Navigate to Reports page
+2. Select filters:
+   - **Period**: Today, Last 7 Days, Last 30 Days
+   - **Barber**: All or specific barber
+   - **Custom Range**: Use start/end date pickers
+3. View summary cards:
+   - Total commissions
+   - Number of tickets
+   - Total revenue
+   - Net revenue (after commissions)
+4. Scroll to see barber breakdowns
+
+**For Barbers:**
+- Only see own commission data
+- Same filtering options
+- Personal performance metrics
+
+### Understanding Reports
+
+**Barber Cards**
+Each barber section shows:
+- Total commission earned
+- Number of services performed
+- Detailed transaction list with:
+  - Date
+  - Ticket number
+  - Commission amount per transaction
+
+**Date Filtering**
+- Quick periods: Today, 7 days, 30 days
+- Custom range: Select specific start/end dates
+- Useful for payroll periods
+
+### Commission Calculation Example
+```
+Service: Classic Haircut = $35
+Commission Rate: 50%
+Barber Earns: $17.50
+
+With Discount of $5:
+Adjusted Price: $30
+Barber Earns: $15.00
+```
+
+## ⚙️ Settings (Admin Only)
+
+### Shop Information
+- **Shop Name**: Appears on receipts and throughout app
+- **Shop Address**: Printed on receipts
+- **Shop Phone**: Contact info on receipts
+
+### Business Settings
+- **Tax Rate**: Applied to all sales (default 8%)
+  - Enter as percentage (e.g., 8 for 8%)
+  - Calculates automatically at checkout
+- **Default Commission Rate**: Starting rate for new services/barbers
+  - Enter as percentage (e.g., 50 for 50%)
+
+### Saving Changes
+Click "Save Settings" after making any changes. Settings apply immediately to new transactions.
+
+## 🖨️ Receipt Printing
+
+### Printing Process
+1. Complete a sale
+2. Receipt dialog appears
+3. Click "Print Receipt"
+4. Browser print dialog opens
+5. Select printer:
+   - Thermal printer (recommended)
+   - Standard printer
+   - Save as PDF
+6. Confirm print
+
+### Receipt Contents
+- BALONG logo and shop info
+- Ticket number
+- Date and time
+- Customer name (if entered)
+- List of services/products
+- Barber names for services
+- Subtotal, tax, total
+- Payment method
+- Change (if cash)
+- Thank you message
+
+### Thermal Printer Tips
+- Receipt optimized for 80mm width
+- Auto-sizing height
+- Black and white design for clarity
+- Reduced ink usage
+
+### Alternative: Save as PDF
+1. Click "Print Receipt"
+2. Select "Save as PDF" in print dialog
+3. Save for digital records
+
+## 💡 Best Practices
+
+### For Cashiers
+- Always assign barbers to services before checkout
+- Double-check totals before completing sale
+- Enter cash received accurately
+- Print receipts for customer records
+
+### For Admins
+- Review dashboard daily
+- Monitor low stock alerts
+- Check commission reports weekly
+- Update service prices seasonally
+- Keep barber information current
+- Regular inventory audits
+
+### For Barbers
+- Check commission reports regularly
+- Review daily earnings
+- Track performance over time
+- Discuss commission rates with management
+
+## 🔒 Security Tips
+
+### Password Management
+- Change default passwords immediately
+- Use strong passwords (8+ characters)
+- Don't share login credentials
+- Log out when leaving the terminal
+
+### Data Safety
+- Regularly backup data (export/print reports)
+- Don't delete old sales data
+- Keep receipts for tax purposes
+- Verify stock counts periodically
+
+## ❓ Troubleshooting
+
+### Can't Login
+- Check username and password spelling
+- Ensure caps lock is off
+- Try demo credentials to test system
+
+### Service Missing from POS
+- Check if service is active in Services page
+- Verify service wasn't accidentally deleted
+
+### Stock Not Updating
+- Ensure sale was completed successfully
+- Check inventory page for current stock
+- Review stock adjustment history
+
+### Commission Not Showing
+- Verify barber was assigned to service
+- Check date range in reports
+- Ensure sale was completed
+
+### Print Not Working
+- Check printer connection
+- Try "Save as PDF" option
+- Verify browser print permissions
+
+## 🎓 Training Checklist
+
+### New Cashier Training
+- [ ] Complete practice sale
+- [ ] Assign barbers to services
+- [ ] Process cash payment with change
+- [ ] Process card payment
+- [ ] Print receipt
+- [ ] Add products to sale
+- [ ] Navigate dashboard
+
+### New Admin Training
+- [ ] Add new service
+- [ ] Add new product
+- [ ] Adjust inventory stock
+- [ ] Add new barber
+- [ ] Run commission report
+- [ ] Modify settings
+- [ ] Complete end-to-end sale
+
+### New Barber Onboarding
+- [ ] Login with credentials
+- [ ] View commission reports
+- [ ] Understand commission calculation
+- [ ] Review personal performance
+
+---
+
+## 📞 Support
+
+For questions or issues with the BALONG POS system, contact your system administrator.
+
+**Remember**: This system is designed to make your barbershop operations smooth and efficient. Take time to explore all features!
