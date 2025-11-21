@@ -1,0 +1,627 @@
+# BALONG POS - System Architecture
+
+## 🏗️ Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         BALONG POS SYSTEM                        │
+│                      Full-Stack Architecture                     │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                        PRESENTATION LAYER                        │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐         │
+│  │   Dashboard  │  │     POS      │  │  Customers   │         │
+│  │    Page      │  │    Screen    │  │    Page      │         │
+│  └──────────────┘  └──────────────┘  └──────────────┘         │
+│                                                                  │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐         │
+│  │ Appointments │  │  Analytics   │  │   Reports    │         │
+│  │    Page      │  │    Page      │  │    Page      │         │
+│  └──────────────┘  └──────────────┘  └──────────────┘         │
+│                                                                  │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐         │
+│  │   Services   │  │  Inventory   │  │   Settings   │         │
+│  │    Page      │  │    Page      │  │    Page      │         │
+│  └──────────────┘  └──────────────┘  └──────────────┘         │
+│                                                                  │
+│              React 18 + TypeScript + Tailwind CSS               │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                      APPLICATION LAYER                           │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌────────────────────────────────────────────────────────┐   │
+│  │                    Auth Context                         │   │
+│  │  • User session management                              │   │
+│  │  • Role-based access control                            │   │
+│  │  • Login/Logout handlers                                │   │
+│  └────────────────────────────────────────────────────────┘   │
+│                                                                  │
+│  ┌────────────────────────────────────────────────────────┐   │
+│  │                     API Layer                           │   │
+│  │  • users: getAll, getById, create, update, delete       │   │
+│  │  • customers: getAll, search, getById, create, update   │   │
+│  │  • appointments: getAll, getByDate, create, update      │   │
+│  │  • services: getAll, getActive, create, update          │   │
+│  │  • products: getAll, getLowStock, adjustStock           │   │
+│  │  • sales: create, getToday, getByDateRange              │   │
+│  │  • commissions: getAll, getByBarberId, markAsPaid       │   │
+│  │  • analytics: getDashboardStats, getSalesReport         │   │
+│  └────────────────────────────────────────────────────────┘   │
+│                                                                  │
+│  ┌────────────────────────────────────────────────────────┐   │
+│  │                Migration Utilities                      │   │
+│  │  • checkSupabaseConnection()                            │   │
+│  │  • runMigration()                                       │   │
+│  │  • exportLocalStorageData()                             │   │
+│  │  • clearLocalStorageData()                              │   │
+│  └────────────────────────────────────────────────────────┘   │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                         DATA LAYER                               │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌──────────────────────┐         ┌──────────────────────┐     │
+│  │  Supabase Client     │         │  localStorage        │     │
+│  │  (Production)        │         │  (Development)       │     │
+│  ├──────────────────────┤         ├──────────────────────┤     │
+│  │ • createClient()     │         │ • userStorage        │     │
+│  │ • Real-time sync     │         │ • serviceStorage     │     │
+│  │ • Authentication     │         │ • productStorage     │     │
+│  │ • File storage       │         │ • saleStorage        │     │
+│  └──────────────────────┘         │ • settingsStorage    │     │
+│                                    └──────────────────────┘     │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                       SERVER LAYER                               │
+│                    (Supabase Edge Functions)                     │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌────────────────────────────────────────────────────────┐   │
+│  │              Hono Web Server (Deno Runtime)            │   │
+│  │                                                          │   │
+│  │  API Endpoints:                                          │   │
+│  │  • POST   /make-server-35678f06/sales                    │   │
+│  ���  • GET    /make-server-35678f06/sales/report             │   │
+│  │  • GET    /make-server-35678f06/appointments             │   │
+│  │  • POST   /make-server-35678f06/appointments             │   │
+│  │  • PATCH  /make-server-35678f06/appointments/:id/status  │   │
+│  │  • GET    /make-server-35678f06/customers/search         │   │
+│  │  • GET    /make-server-35678f06/customers/:id            │   │
+│  │  • POST   /make-server-35678f06/customers                │   │
+│  │  • GET    /make-server-35678f06/analytics/dashboard      │   │
+│  │  • GET    /make-server-35678f06/export/sales             │   │
+│  │                                                          │   │
+│  │  Middleware:                                             │   │
+│  │  • CORS configuration                                    │   │
+│  │  • Request logging                                       │   │
+│  │  • Authentication (requireAuth)                          │   │
+│  │  • Authorization (requireRole)                           │   │
+│  └────────────────────────────────────────────────────────┘   │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                     DATABASE LAYER                               │
+│                  PostgreSQL (Supabase)                           │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌────────────────┐  ┌────────────────┐  ┌────────────────┐  │
+│  │     users      │  │   services     │  │   products     │  │
+│  │  • id (PK)     │  │  • id (PK)     │  │  • id (PK)     │  │
+│  │  • username    │  │  • name        │  │  • name        │  │
+│  │  • name        │  │  • category    │  │  • sku         │  │
+│  │  • role        │  │  • base_price  │  │  • stock       │  │
+│  │  • email       │  │  • duration    │  │  • price       │  │
+│  └────────────────┘  └────────────────┘  └────────────────┘  │
+│                                                                  │
+│  ┌────────────────┐  ┌────────────────┐  ┌────────────────┐  │
+│  │   customers    │  │  appointments  │  │     sales      │  │
+│  │  • id (PK)     │  │  • id (PK)     │  │  • id (PK)     │  │
+│  │  • name        │  │  • customer_id │  │  • ticket_no   │  │
+│  │  • phone       │  │  • barber_id   │  │  • customer_id │  │
+│  │  • email       │  │  • service_id  │  │  • subtotal    │  │
+│  │  • loyalty_pts │  │  • time        │  │  • tax         │  │
+│  │  • total_spent │  │  • status      │  │  • total       │  │
+│  └────────────────┘  └────────────────┘  └────────────────┘  │
+│                                                                  │
+│  ┌────────────────┐  ┌────────────────┐  ┌────────────────┐  │
+│  │  sale_items    │  │  commissions   │  │  settings      │  │
+│  │  • id (PK)     │  │  • id (PK)     │  │  • id (PK)     │  │
+│  │  • sale_id     │  │  • barber_id   │  │  • shop_name   │  │
+│  │  • item_type   │  │  • sale_id     │  │  • address     │  │
+│  │  • quantity    │  │  • amount      │  │  • tax_rate    │  │
+│  │  • price       │  │  • paid        │  │  • comm_rate   │  │
+│  └────────────────┘  └────────────────┘  └────────────────┘  │
+│                                                                  │
+│  Database Functions:                                             │
+│  • update_product_stock(product_id, quantity_change)            │
+│  • update_customer_stats(customer_id, amount, points)           │
+│  • adjust_product_stock(product_id, quantity, reason, user)     │
+│                                                                  │
+│  Row Level Security (RLS):                                       │
+│  • All tables have RLS enabled                                  │
+│  • Policies based on auth.uid() and user roles                  │
+│  • Read/Write permissions per role                              │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 🔄 Data Flow Diagrams
+
+### 1. Sale Transaction Flow
+
+```
+User Action                  Frontend              API Layer           Server              Database
+    │                           │                     │                   │                   │
+    │  1. Add items to cart    │                     │                   │                   │
+    ├──────────────────────────>│                     │                   │                   │
+    │                           │  2. Calculate       │                   │                   │
+    │                           │     totals          │                   │                   │
+    │                           │                     │                   │                   │
+    │  3. Click checkout        │                     │                   │                   │
+    ├──────────────────────────>│                     │                   │                   │
+    │                           │  4. POST sale data  │                   │                   │
+    │                           ├─────────────────────>│                   │                   │
+    │                           │                     │  5. Send to       │                   │
+    │                           │                     │     server        │                   │
+    │                           │                     ├───────────────────>│                   │
+    │                           │                     │                   │  6. Insert sale   │
+    │                           │                     │                   ├───────────────────>│
+    │                           │                     │                   │                   │
+    │                           │                     │                   │  7. Insert items  │
+    │                           │                     │                   ├───────────────────>│
+    │                           │                     │                   │                   │
+    │                           │                     │                   │  8. Update stock  │
+    │                           │                     │                   ├───────────────────>│
+    │                           │                     │                   │                   │
+    │                           │                     │                   │  9. Create        │
+    │                           │                     │                   │     commissions   │
+    │                           │                     │                   ├───────────────────>│
+    │                           │                     │                   │                   │
+    │                           │                     │                   │ 10. Update        │
+    │                           │                     │                   │     customer      │
+    │                           │                     │                   ├───────────────────>│
+    │                           │                     │                   │                   │
+    │                           │                     │                   │ 11. Return success│
+    │                           │                     │                   │<───────────────────┤
+    │                           │                     │  12. Return data  │                   │
+    │                           │                     │<───────────────────┤                   │
+    │                           │  13. Receive        │                   │                   │
+    │                           │      response       │                   │                   │
+    │                           │<─────────────────────┤                   │                   │
+    │  14. Show receipt         │                     │                   │                   │
+    │<──────────────────────────┤                     │                   │                   │
+```
+
+### 2. Appointment Booking Flow
+
+```
+User                Frontend           API Layer         Server           Database
+ │                     │                   │                │                │
+ │  1. Select date    │                   │                │                │
+ ├────────────────────>│                   │                │                │
+ │                     │  2. Load          │                │                │
+ │                     │     appointments  │                │                │
+ │                     ├───────────────────>│                │                │
+ │                     │                   │  3. Query DB   │                │
+ │                     │                   ├────────────────>│                │
+ │                     │                   │                │  4. Get appts  │
+ │                     │                   │                ├────────────────>│
+ │                     │                   │                │<────────────────┤
+ │                     │                   │<────────────────┤                │
+ │                     │<───────────────────┤                │                │
+ │  5. Display slots  │                   │                │                │
+ │<────────────────────┤                   │                │                │
+ │                     │                   │                │                │
+ │  6. Create appt    │                   │                │                │
+ ├────────────────────>│                   │                │                │
+ │                     │  7. POST data     │                │                │
+ │                     ├───────────────────>│                │                │
+ │                     │                   │  8. Check      │                │
+ │                     │                   │     conflicts  │                │
+ │                     │                   ├────────────────>│                │
+ │                     │                   │                │  9. Query      │
+ │                     │                   │                ├────────────────>│
+ │                     │                   │                │<────────────────┤
+ │                     │                   │<────────────────┤                │
+ │                     │                   │                │                │
+ │                     │                   │ 10. Insert     │                │
+ │                     │                   ├────────────────>│                │
+ │                     │                   │                │ 11. Save       │
+ │                     │                   │                ├────────────────>│
+ │                     │                   │                │<────────────────┤
+ │                     │                   │<────────────────┤                │
+ │                     │<───────────────────┤                │                │
+ │ 12. Confirm        │                   │                │                │
+ │<────────────────────┤                   │                │                │
+```
+
+### 3. Authentication Flow
+
+```
+User              Frontend          Supabase Auth        Database
+ │                   │                    │                 │
+ │  1. Enter         │                    │                 │
+ │     credentials   │                    │                 │
+ ├───────────────────>│                    │                 │
+ │                   │  2. signInWith     │                 │
+ │                   │     Password()     │                 │
+ │                   ├────────────────────>│                 │
+ │                   │                    │  3. Verify      │
+ │                   │                    │     password    │
+ │                   │                    │                 │
+ │                   │                    │  4. Query user  │
+ │                   │                    ├─────────────────>│
+ │                   │                    │<─────────────────┤
+ │                   │                    │                 │
+ │                   │  5. Return         │                 │
+ │                   │     session + JWT  │                 │
+ │                   │<────────────────────┤                 │
+ │                   │                    │                 │
+ │                   │  6. Store session  │                 │
+ │                   │     in context     │                 │
+ │                   │                    │                 │
+ │  7. Redirect to   │                    │                 │
+ │     dashboard     │                    │                 │
+ │<───────────────────┤                    │                 │
+```
+
+---
+
+## 🔒 Security Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    SECURITY LAYERS                               │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  Layer 1: Frontend Security                                      │
+│  ┌────────────────────────────────────────────────────────┐   │
+│  │  • Input validation                                      │   │
+│  │  • XSS prevention (React auto-escaping)                  │   │
+│  │  • CSRF token handling                                   │   │
+│  │  • Route protection (PrivateRoute)                       │   │
+│  │  • Role-based UI rendering                               │   │
+│  └────────────────────────────────────────────────────────┘   │
+│                            │                                     │
+│                            ▼                                     │
+│  Layer 2: Transport Security                                     │
+│  ┌────────────────────────────────────────────────────────┐   │
+│  │  • HTTPS/TLS encryption                                  │   │
+│  │  • Secure headers (CORS, CSP)                            │   │
+│  │  • JWT tokens in Authorization header                    │   │
+│  └────────────────────────────────────────────────────────┘   │
+│                            │                                     │
+│                            ▼                                     │
+│  Layer 3: Server Security                                        │
+│  ┌────────────────────────────────────────────────────────┐   │
+│  │  • requireAuth middleware                                │   │
+│  │  • requireRole(['admin']) authorization                  │   │
+│  │  • JWT verification                                      │   │
+│  │  • Input sanitization                                    │   │
+│  │  • Error message sanitization                            │   │
+│  └────────────────────────────────────────────────────────┘   │
+│                            │                                     │
+│                            ▼                                     │
+│  Layer 4: Database Security                                      │
+│  ┌────────────────────────────────────────────────────────┐   │
+│  │  • Row Level Security (RLS) policies                     │   │
+│  │  • Parameterized queries (SQL injection prevention)      │   │
+│  │  • Foreign key constraints                               │   │
+│  │  • Password hashing (bcrypt)                             │   │
+│  │  • Audit logging                                         │   │
+│  └────────────────────────────────────────────────────────┘   │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 📦 Component Architecture
+
+```
+/components
+├── auth/
+│   └── LoginPage.tsx              ─────┐
+│                                        │
+├── layout/                              │
+│   ├── MainLayout.tsx            ─────┐│
+│   └── Sidebar.tsx               ─────┘│
+│                                        │
+├── pos/                                 │  Core Features
+│   ├── POSScreen.tsx             ─────┐│
+│   ├── ServiceGrid.tsx                ││
+│   ├── ProductSearch.tsx              ││
+│   ├── Cart.tsx                        ││
+│   ├── CheckoutDialog.tsx             ││
+│   └── ReceiptDialog.tsx         ─────┘│
+│                                        │
+├── customers/ (NEW)                     │
+│   └── CustomersPage.tsx         ─────┐│
+│                                        ││
+├── appointments/ (NEW)                  ││  Enhanced Features
+│   └── AppointmentsPage.tsx      ─────┐││
+│                                        │││
+├── analytics/ (NEW)                     │││
+│   └── AnalyticsPage.tsx         ─────┘││
+│                                        ││
+├── dashboard/                           ││
+│   └── Dashboard.tsx             ─────┐││
+│                                        │││
+├── services/                            │││
+│   └── ServicesPage.tsx          ─────┐│││  Management
+│                                        ││││
+├── inventory/                           ││││
+│   └── InventoryPage.tsx         ─────┐││││
+│                                        │││││
+├── barbers/                             │││││
+│   └── BarbersPage.tsx           ─────┐│││││
+│                                        ││││││
+├── reports/                             ││││││
+│   └── ReportsPage.tsx           ─────┘││││││
+│                                        ││││││
+├── settings/                            ││││││
+│   └── SettingsPage.tsx          ─────┐││││││
+│                                        │││││││
+├── admin/ (NEW)                         │││││││  Admin Tools
+│   └── MigrationTool.tsx         ─────┘││││││
+│                                        ││││││
+├── receipt/                             ││││││
+│   └── Receipt.tsx               ─────┘│││││
+│                                        │││││
+└── ui/                                  │││││  UI Components
+    ├── button.tsx                       │││││
+    ├── card.tsx                         │││││
+    ├── dialog.tsx                       │││││
+    ├── input.tsx                        │││││
+    ├── table.tsx                        │││││
+    └── ... (40+ components)       ─────┘││││
+                                          ││││
+                                          ││││
+/lib                                      ││││
+├── AuthContext.tsx             ────────┘│││  State Management
+├── api.ts (NEW)                ────────┐│││
+├── storage.ts                           ││││  Data Layer
+├── migration.ts (NEW)          ────────┘│││
+├── types.ts                    ────────┐│││  Type Definitions
+└── utils.ts                    ────────┘││
+                                          ││
+/supabase/functions/server               ││  Backend
+└── index.tsx (NEW)             ────────┘│
+                                          │
+/utils/supabase                           │  Supabase Config
+├── client.ts (NEW)             ────────┘
+└── info.tsx
+```
+
+---
+
+## 🎯 Feature Module Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                     FEATURE MODULES                              │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  Customer Management                                             │
+│  ┌─────────────────────────────────────────────────────────┐  │
+│  │  UI: CustomersPage.tsx                                   │  │
+│  │  API: customers.getAll(), search(), create()             │  │
+│  │  DB: customers table                                     │  │
+│  │  Types: Customer interface                               │  │
+│  └─────────────────────────────────────────────────────────┘  │
+│                                                                  │
+│  Appointment Scheduling                                          │
+│  ┌─────────────────────────────────────────────────────────┐  │
+│  │  UI: AppointmentsPage.tsx                                │  │
+│  │  API: appointments.getByDate(), create(), updateStatus() │  │
+│  │  DB: appointments table                                  │  │
+│  │  Types: Appointment interface                            │  │
+│  │  Logic: Conflict detection, time slot generation         │  │
+│  └─────────────────────────────────────────────────────────┘  │
+│                                                                  │
+│  Advanced Analytics                                              │
+│  ┌─────────────────────────────────────────────────────────┐  │
+│  │  UI: AnalyticsPage.tsx                                   │  │
+│  │  API: analytics.getDashboardStats()                      │  │
+│  │  Charts: Recharts integration                            │  │
+│  │  Types: PerformanceMetrics interface                     │  │
+│  └─────────────────────────────────────────────────────────┘  │
+│                                                                  │
+│  Point of Sale                                                   │
+│  ┌─────────────────────────────────────────────────────────┐  │
+│  │  UI: POSScreen, Cart, Checkout, Receipt                 │  │
+│  │  API: sales.create(), products.getActive()              │  │
+│  │  DB: sales, sale_items, stock updates                   │  │
+│  │  Types: Sale, SaleLineItem interfaces                   │  │
+│  │  Logic: Tax calc, commission calc, receipt generation   │  │
+│  └─────────────────────────────────────────────────────────┘  │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 🔄 State Management
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                   STATE MANAGEMENT FLOW                          │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  Global State (React Context)                                    │
+│  ┌────────────────────────────────────────────────────────┐   │
+│  │  AuthContext                                            │   │
+│  │  • user: User | null                                    │   │
+│  │  • isAuthenticated: boolean                             │   │
+│  │  • login(username, password)                            │   │
+│  │  • logout()                                             │   │
+│  └────────────────────────────────────────────────────────┘   │
+│          │                                                       │
+│          │ Consumed by all components via useAuth()             │
+│          ▼                                                       │
+│  Component Local State (useState)                                │
+│  ┌────────────────────────────────────────────────────────┐   │
+│  │  • Form data                                            │   │
+│  │  • UI state (modals, dialogs)                           │   │
+│  │  • Loading states                                       │   │
+│  │  • Filtered data                                        │   │
+│  │  • Selected items                                       │   │
+│  └────────────────────────────────────────────────────────┘   │
+│          │                                                       │
+│          │ Data fetched via API layer                           │
+│          ▼                                                       │
+│  Server State (API Responses)                                    │
+│  ┌────────────────────────────────────────────────────────┐   │
+│  │  • Fetched via api.ts functions                         │   │
+│  │  • Cached in component state                            │   │
+│  │  • Refreshed on user actions                            │   │
+│  │  • Real-time updates via Supabase                       │   │
+│  └────────────────────────────────────────────────────────┘   │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 📊 Technology Stack Layers
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ PRESENTATION        React 18 + TypeScript                        │
+│                     Tailwind CSS v4                              │
+│                     Shadcn/ui Components                         │
+│                     Recharts Visualization                       │
+│                     Lucide React Icons                           │
+├─────────────────────────────────────────────────────────────────┤
+│ ROUTING             Wouter (Client-side routing)                 │
+├─────────────────────────────────────────────────────────────────┤
+│ STATE               React Context (Global)                       │
+│                     React useState (Local)                       │
+│                     React useEffect (Side effects)               │
+├─────────────────────────────────────────────────────────────────┤
+│ DATA ACCESS         API Layer (lib/api.ts)                       │
+│                     Supabase Client (@supabase/supabase-js)      │
+│                     localStorage (legacy/fallback)               │
+├─────────────────────────────────────────────────────────────────┤
+│ BACKEND             Supabase Edge Functions                      │
+│                     Hono Web Framework                           │
+│                     Deno Runtime                                 │
+├─────────────────────────────────────────────────────────────────┤
+│ DATABASE            PostgreSQL (Supabase)                        │
+│                     Row Level Security                           │
+│                     Stored Functions                             │
+│                     Indexes & Constraints                        │
+├─────────────────────────────────────────────────────────────────┤
+│ AUTHENTICATION      Supabase Auth                                │
+│                     JWT Tokens                                   │
+│                     Bcrypt Hashing                               │
+├─────────────────────────────────────────────────────────────────┤
+│ INFRASTRUCTURE      Supabase Cloud                               │
+│                     CDN (for static assets)                      │
+│                     Edge Locations                               │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 🚀 Deployment Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                     PRODUCTION DEPLOYMENT                        │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  User Devices                                                    │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐       │
+│  │  iPad    │  │  Desktop │  │  Laptop  │  │  Phone   │       │
+│  │ (Cashier)│  │  (Admin) │  │  (Mgr)   │  │ (Barber) │       │
+│  └─────┬────┘  └─────┬────┘  └─────┬────┘  └─────┬────┘       │
+│        │              │              │              │            │
+│        └──────────────┴──────────────┴──────────────┘            │
+│                              │                                    │
+│                         HTTPS/TLS                                │
+│                              │                                    │
+│                              ▼                                    │
+│  ┌────────────────────────────────────────────────────────────┐ │
+│  │                    CDN / Static Hosting                     │ │
+│  │              (React App Bundle - Minified)                  │ │
+│  └────────────────────────────────────────────────────────────┘ │
+│                              │                                    │
+│                              ▼                                    │
+│  ┌────────────────────────────────────────────────────────────┐ │
+│  │                   Supabase Platform                         │ │
+│  │                                                              │ │
+│  │  ┌───────────────────────────────────────────────────┐    │ │
+│  │  │  Edge Functions (Global)                           │    │ │
+│  │  │  • Hono Server                                     │    │ │
+│  │  │  • API Endpoints                                   │    │ │
+│  │  │  • Business Logic                                  │    │ │
+│  │  └───────────────────────────────────────────────────┘    │ │
+│  │                          │                                  │ │
+│  │                          ▼                                  │ │
+│  │  ┌───────────────────────────────────────────────────┐    │ │
+│  │  │  PostgreSQL Database (Primary Region)             │    │ │
+│  │  │  • All tables                                      │    │ │
+│  │  │  • RLS policies                                    │    │ │
+│  │  │  • Functions & Triggers                            │    │ │
+│  │  │  • Automatic backups                               │    │ │
+│  │  └───────────────────────────────────────────────────┘    │ │
+│  │                          │                                  │ │
+│  │                          ▼                                  │ │
+│  │  ┌───────────────────────────────────────────────────┐    │ │
+│  │  │  Database Replicas (Read replicas)                │    │ │
+│  │  │  • Automatic failover                              │    │ │
+│  │  │  • Geographic distribution                         │    │ │
+│  │  └───────────────────────────────────────────────────┘    │ │
+│  │                                                              │ │
+│  │  ┌───────────────────────────────────────────────────┐    │ │
+│  │  │  Storage (for future file uploads)                │    │ │
+│  │  │  • Images                                          │    │ │
+│  │  │  • Receipts                                        │    │ │
+│  │  │  • Backups                                         │    │ │
+│  │  └───────────────────────────────────────────────────┘    │ │
+│  │                                                              │ │
+│  └────────────────────────────────────────────────────────────┘ │
+│                                                                  │
+│  Monitoring & Logging                                            │
+│  ┌────────────────────────────────────────────────────────────┐ │
+│  │  • Supabase Dashboard                                       │ │
+│  │  • Database Metrics                                         │ │
+│  │  • API Logs                                                 │ │
+│  │  • Performance Monitoring                                   │ │
+│  │  • Error Tracking                                           │ │
+│  └────────────────────────────────────────────────────────────┘ │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+This architecture supports:
+- ✅ **Scalability**: Handles multiple concurrent users
+- ✅ **Reliability**: Automatic failover and backups
+- ✅ **Performance**: Edge functions close to users
+- ✅ **Security**: Multiple layers of protection
+- ✅ **Maintainability**: Clear separation of concerns
+- ✅ **Extensibility**: Easy to add new features
+
+---
+
+**Architecture Version**: 2.0.0  
+**Last Updated**: November 20, 2024
